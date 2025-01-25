@@ -29,6 +29,23 @@ const Dashboard = () => {
     const storedUsername = localStorage.getItem('username') || '';
     setUsername(storedUsername);
     setIsAdmin(storedUsername.toLowerCase() === 'admin');
+
+    // Add fetch loans API call
+    const fetchLoans = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/retrieve_loans');
+        if (!response.ok) {
+          throw new Error('Failed to fetch loans');
+        }
+        const data = await response.json();
+        setUserApplications(data.loans);
+      } catch (error) {
+        console.error('Error fetching loans:', error);
+        // You might want to add error handling UI here
+      }
+    };
+
+    fetchLoans();
   }, []);
 
   const handleSubmitRequest = (e) => {
@@ -43,6 +60,19 @@ const Dashboard = () => {
     };
     setUserApplications([newApplication, ...userApplications]);
     setShowRequestForm(false);
+  };
+
+  const getStatusText = (statusCode) => {
+    switch (statusCode) {
+      case 0:
+        return 'pending';
+      case 1:
+        return 'approved';
+      case 2:
+        return 'denied';
+      default:
+        return 'unknown';
+    }
   };
 
   if (!isAdmin) {
@@ -149,29 +179,29 @@ const Dashboard = () => {
             <div className="bg-white/70 backdrop-blur-md rounded-xl border border-white/50 shadow-xl overflow-hidden">
               <div className="divide-y divide-gray-200/50">
                 {userApplications.map((application) => (
-                  <div key={application.id} className="p-6 hover:bg-white/50 transition-colors">
+                  <div key={application.lid} className="p-6 hover:bg-white/50 transition-colors">
                     <div className="flex justify-between items-center">
                       <div>
                         <div className="flex items-center space-x-3">
                           <h3 className="text-lg font-medium text-gray-900">
-                            {application.type}
+                            Home Loan
                           </h3>
                           <span className={`
                             inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                            ${application.status === 'approved' ? 'bg-green-100/70 text-green-800 border-2 border-green-300' : 
-                              application.status === 'denied' ? 'bg-red-100/70 text-red-800 border-2 border-red-300' :
+                            ${getStatusText(application.status) === 'approved' ? 'bg-green-100/70 text-green-800 border-2 border-green-300' : 
+                              getStatusText(application.status) === 'denied' ? 'bg-red-100/70 text-red-800 border-2 border-red-300' :
                               'bg-yellow-100/70 text-yellow-800 border-2 border-yellow-300'}
                           `}>
-                            {application.status.charAt(0).toUpperCase() + application.status.slice(1)}
+                            {getStatusText(application.status).charAt(0).toUpperCase() + getStatusText(application.status).slice(1)}
                           </span>
                         </div>
                         <div className="mt-1 text-sm text-gray-500">
-                          Submitted on {application.submittedDate}
+                          Submitted on {application.created_at ? application.created_at.split('T')[0] : new Date().toISOString().split('T')[0]}
                         </div>
                       </div>
                       <div className="flex items-center space-x-4">
                         <div className="text-lg font-semibold text-gray-900">
-                          ${application.amount.toLocaleString()}
+                          ${Number(application.loan_amount).toLocaleString()}
                         </div>
                         <button className="px-4 py-2 text-sm font-medium text-blue-800 hover:bg-blue-50/80 rounded-lg transition-colors">
                           View Details
@@ -266,26 +296,27 @@ const Dashboard = () => {
             {/* Scrollable Loan List */}
             <div className="flex-1 overflow-y-auto pr-2 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-gray-400">
               <div className="pb-6">
-                {Array.from({ length: 12 }, (_, i) => i + 1).map((item, index) => (
-                  <div key={item} className="flex flex-col border-b last:border-b-0 border-gray-200/50">
+                {userApplications.map((application) => (
+                  <div key={application.lid} className="flex flex-col border-b last:border-b-0 border-gray-200/50">
                     <div className="flex items-center justify-between p-4 hover:bg-white/50 transition-colors">
                       <div className="flex items-center space-x-4">
                         <div className="w-10 h-10 bg-gradient-to-br from-blue-100 to-blue-200 text-blue-800 rounded-full flex items-center justify-center font-medium shadow-sm">
-                          AP
+                          {application.username ? application.username.split(' ').map(n => n[0]).join('').toUpperCase() : 'U'}
                         </div>
                         <div>
-                          <p className="font-medium text-gray-900">Alice Parker</p>
+                          <p className="font-medium text-gray-900">{application.username}</p>
                           <div className="flex items-center space-x-3 mt-1">
-                            <span className="text-sm text-gray-500">Home Loan - $350,000</span>
-                            {index % 2 === 0 ? (
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100/70 backdrop-blur-sm text-green-800 border-2 border-green-300">
-                                Approved
-                              </span>
-                            ) : (
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100/70 backdrop-blur-sm text-red-800 border-2 border-red-300">
-                                Denied
-                              </span>
-                            )}
+                            <span className="text-sm text-gray-500">
+                              Home Loan - ${Number(application.loan_amount).toLocaleString()}
+                            </span>
+                            <span className={`
+                              inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                              ${getStatusText(application.status) === 'approved' ? 'bg-green-100/70 backdrop-blur-sm text-green-800 border-2 border-green-300' : 
+                                getStatusText(application.status) === 'denied' ? 'bg-red-100/70 backdrop-blur-sm text-red-800 border-2 border-red-300' :
+                                'bg-yellow-100/70 backdrop-blur-sm text-yellow-800 border-2 border-yellow-300'}
+                            `}>
+                              {getStatusText(application.status).charAt(0).toUpperCase() + getStatusText(application.status).slice(1)}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -309,11 +340,9 @@ const Dashboard = () => {
             <div className="mb-8 p-5 bg-gradient-to-br from-blue-50/80 to-blue-100/50 backdrop-blur-sm rounded-xl border-2 border-blue-200 shadow-sm">
               <p className="text-sm font-medium text-blue-800 mb-1">Total Loan Value</p>
               <div className="flex items-baseline">
-                <span className="text-3xl font-bold text-gray-900">$12.8M</span>
-                <div className="ml-3 inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-green-100/70 backdrop-blur-sm text-green-800 border border-green-200/50">
-                  <TrendingUp className="w-4 h-4 mr-1" />
-                  8.2%
-                </div>
+                <span className="text-3xl font-bold text-gray-900">
+                  ${userApplications.reduce((sum, app) => sum + Number(app.loan_amount), 0).toLocaleString()}
+                </span>
               </div>
             </div>
 
@@ -353,11 +382,15 @@ const Dashboard = () => {
             <div className="grid grid-cols-2 gap-4 mb-2">
               <div className="p-4 bg-gray-50/80 backdrop-blur-sm rounded-xl border-2 border-gray-200 shadow-sm">
                 <p className="text-sm font-medium text-gray-800 mb-1">Approved</p>
-                <p className="text-2xl font-semibold text-gray-900">276</p>
+                <p className="text-2xl font-semibold text-gray-900">
+                  {userApplications.filter(app => app.status === 1).length}
+                </p>
               </div>
               <div className="p-4 bg-gray-50/80 backdrop-blur-sm rounded-xl border-2 border-gray-200 shadow-sm">
                 <p className="text-sm font-medium text-gray-800 mb-1">Denied</p>
-                <p className="text-2xl font-semibold text-gray-900">48</p>
+                <p className="text-2xl font-semibold text-gray-900">
+                  {userApplications.filter(app => app.status === 2).length}
+                </p>
               </div>
             </div>
           </div>
