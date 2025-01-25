@@ -22,8 +22,17 @@ def create_tables(conn: sqlite3.Connection):
             lid INTEGER PRIMARY KEY AUTOINCREMENT,
             cid INTEGER NOT NULL,
             bid INTEGER NOT NULL,
-            load_data TEXT NOT NULL,
+            loan_amount INTEGER,
+            income INTEGER,
+            property_value INTEGER,
+            debt_to_income_ratio REAL,
+            derived_race INTEGER,
+            derived_sex INTEGER,
+            occupancy_type INTEGER,
+            loan_purpose INTEGER,
+            action_taken INTEGER,
             status INTEGER NOT NULL,
+            created_at TEXT DEFAULT (datetime('now')),
             FOREIGN KEY (cid) REFERENCES client(cid),
             FOREIGN KEY (bid) REFERENCES banker(bid)
         );
