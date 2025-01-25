@@ -7,46 +7,31 @@ const Dashboard = () => {
   const [username, setUsername] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
   const [showRequestForm, setShowRequestForm] = useState(false);
-  const [userApplications, setUserApplications] = useState([
-    // Temporary mock data - replace with actual API calls
-    {
-      id: 1,
-      amount: 350000,
-      status: 'pending',
-      submittedDate: '2024-03-15',
-      type: 'Home Loan'
-    },
-    {
-      id: 2,
-      amount: 250000,
-      status: 'approved',
-      submittedDate: '2024-02-28',
-      type: 'Home Loan'
-    }
-  ]);
+  const [userApplications, setUserApplications] = useState([]);
 
   useEffect(() => {
     const storedUsername = localStorage.getItem('username') || '';
     setUsername(storedUsername);
     setIsAdmin(storedUsername.toLowerCase() === 'admin');
 
-    // Add fetch loans API call
-    const fetchLoans = async () => {
-      try {
-        const response = await fetch('http://localhost:5000/api/retrieve_loans');
-        if (!response.ok) {
-          throw new Error('Failed to fetch loans');
+    // Only fetch loans if we have a username
+    if (storedUsername) {
+      const fetchLoans = async () => {
+        try {
+          const response = await fetch(`http://localhost:5000/api/retrieve_loans?username=${storedUsername}`);
+          if (!response.ok) {
+            throw new Error('Failed to fetch loans');
+          }
+          const data = await response.json();
+          setUserApplications(data.loans);
+        } catch (error) {
+          console.error('Error fetching loans:', error);
         }
-        const data = await response.json();
-        setUserApplications(data.loans);
-      } catch (error) {
-        console.error('Error fetching loans:', error);
-        // You might want to add error handling UI here
-      }
-    };
+      };
 
-    fetchLoans();
-  }, []);
+      fetchLoans();
+    }
+  }, [username]);
 
   const handleSubmitRequest = (e) => {
     e.preventDefault();

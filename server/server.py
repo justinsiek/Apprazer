@@ -94,12 +94,18 @@ def upload_file():
 @app.route('/api/retrieve_loans', methods=['GET'])
 def retrieve_loans():
     try:
+        # Get username from query parameters
+        username = request.args.get('username')
+        
         # Connect to the database
         conn = sqlite3.connect('loandb.db')
         cursor = conn.cursor()
         
-        # Fetch all loans (simplified query without JOINs)
-        cursor.execute("SELECT * FROM loan")
+        # Modify query to filter by username if provided
+        if username and username.lower() != 'admin':
+            cursor.execute("SELECT * FROM loan WHERE username = ?", (username,))
+        else:
+            cursor.execute("SELECT * FROM loan")  # Admin sees all loans
         
         # Get column names from cursor description
         columns = [description[0] for description in cursor.description]
@@ -114,7 +120,7 @@ def retrieve_loans():
             loans_list.append(loan_dict)
             
         conn.close()
-        
+
         return jsonify({
             'message': 'Loans retrieved successfully',
             'loans': loans_list
