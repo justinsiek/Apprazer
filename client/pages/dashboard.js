@@ -4,6 +4,9 @@ import { TrendingUp, Plus, Bell } from 'lucide-react';
 import Image from 'next/image';
 
 const Dashboard = () => {
+  const username = localStorage.getItem('username');
+  
+
   return (
     <div className="h-screen bg-white overflow-hidden relative">
       {/* Background Blur Elements */}
@@ -26,9 +29,9 @@ const Dashboard = () => {
           </button>
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white border border-white/20">
-              JD
+              {username ? username.charAt(0).toUpperCase() : '?'}
             </div>
-            <span className="text-white/90">John Doe</span>
+            <span className="text-white/90">{username}</span>
           </div>
         </div>
       </nav>
