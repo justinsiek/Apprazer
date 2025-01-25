@@ -1,33 +1,16 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
+import { useRouter } from 'next/router';
 
-function Index() {
-  const [fileContent, setFileContent] = useState('');
+function App() {
+    const router = useRouter();
 
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    const formData = new FormData();
-    formData.append('file', file);
+    useEffect(() => {
+        router.push('/home');
+    }, [router]);
 
-    fetch('http://localhost:8080/api/upload', {
-      method: 'POST',
-      body: formData,
-    })
-      .then(response => response.json())
-      .then(data => {
-        setFileContent(data.content);
-      });
-  };
-
-  return (
-    <div className='flex flex-col justify-center items-center h-screen'>
-      <p className='mb-4'>{fileContent}</p>
-      <input
-        type="file"
-        onChange={handleFileChange}
-        className='mb-4'
-      />
-    </div>
-  );
+    return (
+        <div/>
+    );
 }
 
-export default Index;
+export default App;
