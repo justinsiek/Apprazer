@@ -1,5 +1,10 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+
+import sqlite3
+
+dbname = 'loaddb.db'
+connection = sqlite3.connect(dbname)
 from aryn_sdk.partition import partition_file
 from werkzeug.utils import secure_filename
 import os
