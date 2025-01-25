@@ -1,8 +1,10 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { ArrowRight, CheckCircle2, Clock, Brain, Shield, BarChart2, Users, Zap, Lock, LineChart } from 'lucide-react'
+import { ArrowRight, CheckCircle2, Clock, Brain, Shield, BarChart2, Users, Zap, Lock, LineChart, ChevronLeft, ChevronRight } from 'lucide-react'
 
 const Home = () => {
+  const [currentSlide, setCurrentSlide] = useState(0)
+
   return (
     <div className='min-h-screen bg-gradient-to-br from-gray-50 via-gray-50 to-blue-50 relative overflow-hidden'>
       {/* Background Blur Elements */}
@@ -12,7 +14,7 @@ const Home = () => {
       
 
       {/* Hero Section - Enhanced */}
-      <div className='max-w-7xl mx-auto px-8 py-32 relative'>
+      <div className='min-h-[calc(100vh-80px)] max-w-7xl mx-auto px-8 py-32 relative'>
         <div className='grid grid-cols-2 gap-16 items-center'>
           {/* Left Column */}
           <div className='space-y-8'>
@@ -114,64 +116,102 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Features Grid - Enhanced */}
-      <div className='bg-white/50 backdrop-blur-md py-32'>
+      {/* Features Carousel */}
+      <div className='bg-gradient-to-br from-blue-950 via-blue-900 to-blue-800 py-32'>
         <div className='max-w-7xl mx-auto px-8'>
           <div className='text-center mb-16'>
-            <h2 className='text-3xl font-bold text-gray-900 mb-4'>Powerful Features</h2>
-            <p className='text-xl text-gray-500'>Everything you need in one platform</p>
+            <h2 className='text-3xl font-bold text-white mb-4'>Powerful Features</h2>
+            <p className='text-xl text-blue-100/80'>Everything you need in one platform</p>
           </div>
-          <div className='grid grid-cols-4 gap-6'>
-            {[
-              {
-                icon: <Brain className='w-6 h-6 text-blue-800' />,
-                title: 'Smart Analysis',
-                description: 'AI-powered insights for faster decisions'
-              },
-              {
-                icon: <Clock className='w-6 h-6 text-blue-800' />,
-                title: 'Quick Processing',
-                description: '45-minute average processing time'
-              },
-              {
-                icon: <Shield className='w-6 h-6 text-blue-800' />,
-                title: 'Bank-Grade Security',
-                description: 'Enterprise-level data protection'
-              },
-              {
-                icon: <Zap className='w-6 h-6 text-blue-800' />,
-                title: 'Instant Updates',
-                description: 'Real-time status notifications'
-              },
-              {
-                icon: <Lock className='w-6 h-6 text-blue-800' />,
-                title: 'Compliance Ready',
-                description: 'Built-in regulatory compliance'
-              },
-              {
-                icon: <Users className='w-6 h-6 text-blue-800' />,
-                title: 'Team Collaboration',
-                description: 'Seamless team workflows'
-              },
-              {
-                icon: <LineChart className='w-6 h-6 text-blue-800' />,
-                title: 'Analytics',
-                description: 'Detailed performance metrics'
-              },
-              {
-                icon: <ArrowRight className='w-6 h-6 text-blue-800' />,
-                title: 'API Access',
-                description: 'Full integration capabilities'
-              }
-            ].map((feature, index) => (
-              <div key={index} className='p-6 bg-white/50 backdrop-blur-sm rounded-xl border border-white/50 hover:bg-white/80 transition-all duration-300'>
-                <div className='h-12 w-12 bg-blue-100/50 backdrop-blur-sm rounded-xl flex items-center justify-center mb-4'>
-                  {feature.icon}
-                </div>
-                <h3 className='text-lg font-semibold text-gray-900 mb-2'>{feature.title}</h3>
-                <p className='text-sm text-gray-500'>{feature.description}</p>
+          
+          <div className='relative'>
+            {/* Carousel Container */}
+            <div className='overflow-hidden'>
+              <div className='flex transition-transform duration-500 ease-in-out'
+                   style={{ transform: `translateX(-${currentSlide * 25}%)` }}>
+                {[
+                  {
+                    icon: <Brain className='w-6 h-6 text-blue-800' />,
+                    title: 'Smart Analysis',
+                    description: 'AI-powered insights for faster decisions'
+                  },
+                  {
+                    icon: <Clock className='w-6 h-6 text-blue-800' />,
+                    title: 'Quick Processing',
+                    description: '45-minute average processing time'
+                  },
+                  {
+                    icon: <Shield className='w-6 h-6 text-blue-800' />,
+                    title: 'Bank-Grade Security',
+                    description: 'Enterprise-level data protection'
+                  },
+                  {
+                    icon: <Zap className='w-6 h-6 text-blue-800' />,
+                    title: 'Instant Updates',
+                    description: 'Real-time status notifications'
+                  },
+                  {
+                    icon: <Lock className='w-6 h-6 text-blue-800' />,
+                    title: 'Compliance Ready',
+                    description: 'Built-in regulatory compliance'
+                  },
+                  {
+                    icon: <Users className='w-6 h-6 text-blue-800' />,
+                    title: 'Team Collaboration',
+                    description: 'Seamless team workflows'
+                  },
+                  {
+                    icon: <LineChart className='w-6 h-6 text-blue-800' />,
+                    title: 'Analytics',
+                    description: 'Detailed performance metrics'
+                  },
+                  {
+                    icon: <ArrowRight className='w-6 h-6 text-blue-800' />,
+                    title: 'API Access',
+                    description: 'Full integration capabilities'
+                  }
+                ].map((feature, index) => (
+                  <div key={index} className='min-w-[25%] px-3'>
+                    <div className='p-6 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 hover:bg-white/20 transition-all duration-300 h-full'>
+                      <div className='h-12 w-12 bg-blue-100/10 backdrop-blur-sm rounded-xl flex items-center justify-center mb-4'>
+                        {feature.icon}
+                      </div>
+                      <h3 className='text-lg font-semibold text-white mb-2'>{feature.title}</h3>
+                      <p className='text-sm text-blue-100/80'>{feature.description}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
+
+            {/* Navigation Buttons */}
+            <button 
+              onClick={() => setCurrentSlide(Math.max(0, currentSlide - 1))}
+              className='absolute left-0 top-1/2 -translate-y-1/2 -translate-x-12 p-2 rounded-full bg-white/10 border border-white/20 shadow-lg hover:bg-white/20 transition-all duration-200'
+              disabled={currentSlide === 0}
+            >
+              <ChevronLeft className='w-6 h-6 text-white' />
+            </button>
+            <button 
+              onClick={() => setCurrentSlide(Math.min(4, currentSlide + 1))}
+              className='absolute right-0 top-1/2 -translate-y-1/2 translate-x-12 p-2 rounded-full bg-white/10 border border-white/20 shadow-lg hover:bg-white/20 transition-all duration-200'
+              disabled={currentSlide === 4}
+            >
+              <ChevronRight className='w-6 h-6 text-white' />
+            </button>
+
+            {/* Dots Navigation */}
+            <div className='flex justify-center space-x-2 mt-8'>
+              {[0, 1, 2, 3, 4].map((dot) => (
+                <button
+                  key={dot}
+                  onClick={() => setCurrentSlide(dot)}
+                  className={`w-2 h-2 rounded-full transition-all duration-200 ${
+                    currentSlide === dot ? 'bg-white w-4' : 'bg-white/30'
+                  }`}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -187,19 +227,19 @@ const Home = () => {
           <div className='grid grid-cols-3 gap-8'>
             {[
               {
-                quote: "Apprazer has transformed our loan processing. We've cut our approval time in half.",
-                author: "Sarah Johnson",
-                role: "VP of Operations, FirstBank"
+                quote: "Apprazer has completely transformed our loan processing. We've cut our approval time in half.",
+                author: "Andrew Hwang",
+                role: "CEO of Sonder"
               },
               {
                 quote: "The AI-powered insights have significantly improved our decision-making process.",
-                author: "Michael Chen",
-                role: "Credit Manager, Pacific Lending"
+                author: "Brooke Ebright",
+                role: "Mayor of Apple Valley"
               },
               {
                 quote: "Outstanding support team and intuitive interface. Exactly what we needed.",
-                author: "Emily Rodriguez",
-                role: "Director of Finance, Metro Credit"
+                author: "Kyle Tran",
+                role: "Guy from Seattle"
               }
             ].map((testimonial, index) => (
               <div key={index} className='p-6 bg-white rounded-xl border border-gray-200 shadow-sm'>
@@ -243,44 +283,9 @@ const Home = () => {
       </div>
 
       {/* Footer */}
-      <footer className='bg-gray-900 text-gray-400 py-12'>
-        <div className='max-w-7xl mx-auto px-8'>
-          <div className='grid grid-cols-4 gap-8'>
-            <div>
-              <span className='text-xl font-semibold text-white mb-4 block'>Apprazer</span>
-              <p className='text-sm'>Modernizing loan approvals with AI-powered solutions.</p>
-            </div>
-            {[
-              {
-                title: 'Product',
-                links: ['Features', 'Pricing', 'Security', 'Updates']
-              },
-              {
-                title: 'Company',
-                links: ['About', 'Careers', 'Blog', 'Press']
-              },
-              {
-                title: 'Resources',
-                links: ['Documentation', 'Help Center', 'API', 'Status']
-              }
-            ].map((column, index) => (
-              <div key={index}>
-                <h3 className='font-semibold text-white mb-4'>{column.title}</h3>
-                <ul className='space-y-2'>
-                  {column.links.map((link, i) => (
-                    <li key={i}>
-                      <Link href="#" className='hover:text-white transition-colors'>
-                        {link}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-          <div className='border-t border-gray-800 mt-12 pt-8 text-sm'>
-            <p>© 2024 Apprazer. All rights reserved.</p>
-          </div>
+      <footer className='bg-gray-900 text-gray-400 py-8'>
+        <div className='max-w-7xl mx-auto px-8 text-sm'>
+          <p>© 2024 Apprazer. All rights reserved.</p>
         </div>
       </footer>
     </div>

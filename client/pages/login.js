@@ -4,17 +4,26 @@ import Link from 'next/link'
 const Login = () => {
   return (
     <div className='flex min-h-screen'>
-      {/* Left Section */}
-      <div className='w-1/2 bg-blue-800 text-white p-12 flex flex-col justify-between'>
-        <div>
+      {/* Left Section - Enhanced with more prominent gradients */}
+      <div className='relative w-1/2 bg-gradient-to-br from-blue-950 via-blue-900 to-blue-800 text-white p-12 flex flex-col justify-between overflow-hidden'>
+        {/* Background gradient blobs - increased size and opacity */}
+        <div className='absolute top-[-20%] left-[-10%] w-[800px] h-[800px] bg-blue-500/40 rounded-full mix-blend-multiply filter blur-[120px] animate-blob'></div>
+        <div className='absolute top-[20%] right-[-20%] w-[600px] h-[600px] bg-indigo-500/40 rounded-full mix-blend-multiply filter blur-[120px] animate-blob animation-delay-2000'></div>
+        <div className='absolute bottom-[-20%] left-[10%] w-[700px] h-[700px] bg-violet-500/40 rounded-full mix-blend-multiply filter blur-[120px] animate-blob animation-delay-4000'></div>
+        
+        {/* Overlay gradient for better text contrast */}
+        <div className='absolute inset-0 bg-gradient-to-b from-blue-900/10 to-blue-950/50'></div>
+        
+        {/* Content */}
+        <div className='relative z-10'>
           <span className='text-xl font-semibold'>Apprazer</span>
         </div>
         
-        <div className='max-w-md'>
+        <div className='relative z-10 max-w-md'>
           <blockquote className='text-2xl font-medium mb-4'>
             "This application saved my life, and I'm so grateful for it."
           </blockquote>
-          <p className='text-white'>Jillyan Canaveral</p>
+          <p className='text-white/90'>- Leo Wucohen</p>
         </div>
       </div>
 
@@ -38,14 +47,14 @@ const Login = () => {
           
           <Link 
             href="/dashboard" 
-            className='flex h-12 w-full bg-blue-800 hover:bg-blue-800 text-white font-semibold rounded-lg transition-all duration-200 justify-center items-center shadow-md hover:shadow-lg transform hover:-translate-y-0.5'
+            className='flex h-12 w-full bg-blue-800 hover:bg-blue-900 text-white font-semibold rounded-lg transition-all duration-200 justify-center items-center shadow-md hover:shadow-lg transform hover:-translate-y-0.5'
           >
             Sign In
           </Link>
 
           <div className='flex gap-1 text-sm'>
             <span className='text-gray-500'>Don't have an account?</span>
-            <Link href="/signup" className='text-blue-800 hover:text-blue-800 font-medium'>
+            <Link href="/signup" className='text-blue-800 hover:text-blue-900 font-medium'>
               Sign up
             </Link>
           </div>
