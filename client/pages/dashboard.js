@@ -12,8 +12,6 @@ const Dashboard = () => {
           </Link>
           <div className="flex space-x-6">
             <Link href="/dashboard" className="text-gray-900 font-medium">Dashboard</Link>
-            <Link href="/loans" className="text-gray-500 hover:text-gray-900">Loans</Link>
-            <Link href="/reports" className="text-gray-500 hover:text-gray-900">Reports</Link>
             <Link href="/settings" className="text-gray-500 hover:text-gray-900">Settings</Link>
           </div>
         </div>
@@ -33,7 +31,7 @@ const Dashboard = () => {
       </nav>
 
       {/* Main Content */}
-      <main className="p-6">
+      <main className="flex-1 p-6 pb-8 overflow-hidden">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <div>
@@ -57,55 +55,9 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-4 gap-6 mb-6">
-          <div className="bg-white p-6 rounded-xl border border-gray-200">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-gray-500">Total Requests</h3>
-              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-              </svg>
-            </div>
-            <p className="text-3xl font-bold">2,345</p>
-          </div>
-          
-          <div className="bg-white p-6 rounded-xl border border-gray-200">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-gray-500">Approval Rate</h3>
-              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
-            </div>
-            <p className="text-3xl font-bold">73.2%</p>
-            <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
-              <div className="bg-blue-800 h-2.5 rounded-full" style={{width: '73.2%'}}></div>
-            </div>
-          </div>
-
-          <div className="bg-white p-6 rounded-xl border border-gray-200">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-gray-500">Pending Review</h3>
-              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <p className="text-3xl font-bold">189</p>
-          </div>
-
-          <div className="bg-white p-6 rounded-xl border border-gray-200">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-gray-500">Rejected</h3>
-              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </div>
-            <p className="text-3xl font-bold">432</p>
-          </div>
-        </div>
-
-        {/* Recent Loans and Analytics Section */}
-        <div className="grid grid-cols-3 gap-6">
-          <div className="col-span-2 bg-white rounded-xl border border-gray-200 p-6">
+        {/* Grid Container */}
+        <div className="grid grid-cols-3 gap-6 h-[calc(100vh-200px)]">
+          <div className="col-span-2 rounded-xl border border-gray-200 p-6 bg-white overflow-hidden flex flex-col">
             <div className="flex justify-between items-center mb-6">
               <div>
                 <h2 className="text-lg font-semibold">Recent Loan Requests</h2>
@@ -114,10 +66,10 @@ const Dashboard = () => {
             </div>
             
             {/* Loan Request List */}
-            <div className="space-y-4 border-y border-gray-200 py-2">
-              {[1, 2, 3, 4].map((item, index) => (
-                <div key={item}>
-                  <div className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg">
+            <div className="flex flex-col flex-1 border-y border-gray-200 py-2 bg-white">
+              {[1, 2, 3, 4, 5, 6].map((item, index) => (
+                <div key={item} className="flex-1 flex flex-col border-b last:border-b-0 border-gray-200">
+                  <div className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg flex-1">
                     <div className="flex items-center space-x-4">
                       <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
                         AP
@@ -132,7 +84,6 @@ const Dashboard = () => {
                       <button className="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 rounded-lg">Details</button>
                     </div>
                   </div>
-                  {index < 3 && <div className="border-b border-gray-200 my-1"></div>}
                 </div>
               ))}
             </div>
@@ -153,48 +104,76 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
-            <h2 className="text-lg font-semibold mb-2">Approval Analytics</h2>
+          <div className="bg-white rounded-xl border border-gray-200 p-6 overflow-y-auto">
+            <h2 className="text-lg font-semibold mb-2">Home Loan Analytics</h2>
             <p className="text-gray-500 text-sm mb-6">Last 30 days performance</p>
             
-            <div className="space-y-4">
-              <div>
-                <div className="flex justify-between mb-1">
-                  <span className="text-sm text-gray-600">Home Loans</span>
-                  <span className="text-sm font-medium">82%</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-blue-800 h-2 rounded-full" style={{width: '82%'}}></div>
+            {/* Money Metric */}
+            <div className="mb-8 p-4 bg-blue-50 rounded-xl">
+              <p className="text-sm text-blue-800 mb-1">Total Loan Value</p>
+              <div className="flex items-baseline">
+                <span className="text-3xl font-bold text-blue-800">$12.8M</span>
+                <span className="ml-2 text-sm text-blue-600">+8.2% from last month</span>
+              </div>
+            </div>
+
+            {/* Circular Progress */}
+            <div className="flex justify-center mb-16">
+              <div className="relative w-40 h-40">
+                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                  {/* Light blue background arc */}
+                  <path
+                    d="M 50,50 m 0,-45 a 45,45 0 1 1 0,90 a 45,45 0 1 1 0,-90"
+                    fill="none"
+                    stroke="#E6F3FF"
+                    strokeWidth="10"
+                  />
+                  {/* Main progress arc */}
+                  <path
+                    d="M 50,50 m 0,-45 a 45,45 0 1 1 0,90 a 45,45 0 1 1 0,-90"
+                    fill="none"
+                    stroke="#1E40AF"
+                    strokeWidth="10"
+                    strokeLinecap="round"
+                    strokeDasharray={`${85.5 * 2.83} ${100 * 2.83}`}
+                  />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span className="text-3xl font-bold text-blue-800">85.5%</span>
+                  <span className="text-sm text-blue-600">Normal Level</span>
                 </div>
               </div>
-              
+            </div>
+
+            <div className="space-y-6">
               <div>
-                <div className="flex justify-between mb-1">
-                  <span className="text-sm text-gray-600">Business Loans</span>
-                  <span className="text-sm font-medium">67%</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-blue-800 h-2 rounded-full" style={{width: '67%'}}></div>
+                <div className="w-full bg-blue-100 rounded-full h-3">
+                  <div className="bg-blue-800 h-3 rounded-full transition-all duration-500" style={{width: '92%'}}></div>
                 </div>
               </div>
 
               <div>
-                <div className="flex justify-between mb-1">
-                  <span className="text-sm text-gray-600">Personal Loans</span>
-                  <span className="text-sm font-medium">75%</span>
+                <div className="flex justify-between mb-2">
+                  <span className="text-sm text-gray-600">Average Loan Amount</span>
+                  <span className="text-sm font-medium text-blue-800">$285,000</span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-blue-800 h-2 rounded-full" style={{width: '75%'}}></div>
+                <div className="w-full bg-blue-100 rounded-full h-3">
+                  <div className="bg-blue-800 h-3 rounded-full transition-all duration-500" style={{width: '65%'}}></div>
                 </div>
               </div>
 
+              {/* Segmented Bar */}
               <div>
-                <div className="flex justify-between mb-1">
-                  <span className="text-sm text-gray-600">Auto Loans</span>
-                  <span className="text-sm font-medium">92%</span>
+                <p className="text-sm text-gray-600 mb-2">Customer Distribution</p>
+                <div className="flex h-4 rounded-lg overflow-hidden">
+                  <div className="bg-blue-800 w-[45%]" title="First-Time Buyers: 45%"></div>
+                  <div className="bg-blue-600 w-[28%]" title="Return Customers: 28%"></div>
+                  <div className="bg-blue-400 w-[27%]" title="Others: 27%"></div>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-blue-800 h-2 rounded-full" style={{width: '92%'}}></div>
+                <div className="flex text-xs mt-1 text-gray-600 justify-between">
+                  <span>First-Time (45%)</span>
+                  <span>Return (28%)</span>
+                  <span>Other (27%)</span>
                 </div>
               </div>
             </div>
