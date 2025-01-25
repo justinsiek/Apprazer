@@ -1,5 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 
 const Login = () => {
   return (
@@ -16,7 +17,13 @@ const Login = () => {
         
         {/* Content */}
         <div className='relative z-10'>
-          <span className='text-xl font-semibold'>Apprazer</span>
+          <Image 
+            src="/cutwhitelogo.gif" 
+            alt="Apprazer Logo" 
+            width={150} 
+            height={40} 
+            className="object-contain"
+          />
         </div>
         
         <div className='relative z-10 max-w-md'>

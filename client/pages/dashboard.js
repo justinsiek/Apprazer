@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { TrendingUp, Plus, Bell } from 'lucide-react';
+import Image from 'next/image';
 
 const Dashboard = () => {
   return (
@@ -10,12 +11,10 @@ const Dashboard = () => {
       <div className='absolute top-[20%] right-[20%] w-[400px] h-[400px] bg-purple-400/20 rounded-full mix-blend-multiply filter blur-[128px] animate-blob animation-delay-2000'></div>
       <div className='absolute bottom-0 right-[10%] w-[600px] h-[600px] bg-blue-400/20 rounded-full mix-blend-multiply filter blur-[128px] animate-blob animation-delay-4000'></div>
 
-      {/* Navigation Bar - Solid blue-800 */}
-      <nav className="relative z-10 flex items-center justify-between px-6 py-4 bg-blue-800">
+      {/* Navigation Bar */}
+      <nav className="relative z-10 flex items-center justify-between px-6 py-4 bg-gradient-to-r from-blue-950 via-blue-900 to-blue-800">
         <div className="flex items-center space-x-8">
-          <Link href="/dashboard" className="text-xl font-semibold text-white">
-            Apprazer
-          </Link>
+          <Image src="/cutwhitelogo.gif" alt="Apprazer Logo" width={120} height={40} className="object-contain translate-y-0.5" />
           <div className="flex space-x-6">
             <Link href="/dashboard" className="text-white/90 font-medium">Dashboard</Link>
             <Link href="/settings" className="text-white/60 hover:text-white/90">Settings</Link>
@@ -121,7 +120,7 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="flex flex-col bg-white/70 backdrop-blur-md rounded-xl border border-white/50 shadow-xl p-6 overflow-hidden">
+          <div className="flex flex-col justify-between bg-white/70 backdrop-blur-md rounded-xl border border-white/50 shadow-xl p-6 overflow-hidden">
             <h2 className="text-lg font-semibold text-gray-900 mb-2">Analytics Overview</h2>
             <p className="text-gray-500 text-sm mb-6">Performance metrics for the last 30 days</p>
             
