@@ -49,7 +49,7 @@ y = df['action_taken']
 
 # Split categorical and numerical columns
 categorical_columns = ['derived_race', 'derived_sex', 'occupancy_type', 'loan_purpose']
-numerical_columns = ['loan_amount', 'income', 'interest_rate', 'property_value', 'debt_to_income_ratio']
+numerical_columns = ['loan_amount', 'income', 'property_value', 'debt_to_income_ratio']
 
 # Initialize encoders
 label_encoders = {}
