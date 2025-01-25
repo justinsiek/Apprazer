@@ -1,9 +1,193 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { TrendingUp, Plus, Bell } from 'lucide-react';
 import Image from 'next/image';
 
 const Dashboard = () => {
+  const [username, setUsername] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [showRequestForm, setShowRequestForm] = useState(false);
+  const [userApplications, setUserApplications] = useState([
+    // Temporary mock data - replace with actual API calls
+    {
+      id: 1,
+      amount: 350000,
+      status: 'pending',
+      submittedDate: '2024-03-15',
+      type: 'Home Loan'
+    },
+    {
+      id: 2,
+      amount: 250000,
+      status: 'approved',
+      submittedDate: '2024-02-28',
+      type: 'Home Loan'
+    }
+  ]);
+
+  useEffect(() => {
+    const storedUsername = localStorage.getItem('username') || '';
+    setUsername(storedUsername);
+    setIsAdmin(storedUsername.toLowerCase() === 'admin');
+  }, []);
+
+  const handleSubmitRequest = (e) => {
+    e.preventDefault();
+    // Add API call logic here
+    const newApplication = {
+      id: userApplications.length + 1,
+      amount: parseFloat(e.target.amount.value),
+      status: 'pending',
+      submittedDate: new Date().toISOString().split('T')[0],
+      type: 'Home Loan'
+    };
+    setUserApplications([newApplication, ...userApplications]);
+    setShowRequestForm(false);
+  };
+
+  if (!isAdmin) {
+    return (
+      <div className="h-screen bg-white overflow-hidden relative">
+        {/* Background Blur Elements */}
+        <div className='absolute top-0 left-0 w-[500px] h-[500px] bg-blue-400/20 rounded-full mix-blend-multiply filter blur-[128px] animate-blob'></div>
+        <div className='absolute top-[20%] right-[20%] w-[400px] h-[400px] bg-purple-400/20 rounded-full mix-blend-multiply filter blur-[128px] animate-blob animation-delay-2000'></div>
+        <div className='absolute bottom-0 right-[10%] w-[600px] h-[600px] bg-blue-400/20 rounded-full mix-blend-multiply filter blur-[128px] animate-blob animation-delay-4000'></div>
+
+        {/* Navigation Bar - Reusing admin nav style */}
+        <nav className="relative z-10 flex items-center justify-between px-6 py-4 bg-gradient-to-r from-blue-950 via-blue-900 to-blue-800">
+          <div className="flex items-center space-x-8">
+            <Image src="/cutwhitelogo.gif" alt="Apprazer Logo" width={120} height={40} className="object-contain translate-y-0.5" />
+            <div className="flex space-x-6">
+              <Link href="/dashboard" className="text-white/90 font-medium">Dashboard</Link>
+              <Link href="/settings" className="text-white/60 hover:text-white/90">Settings</Link>
+            </div>
+          </div>
+          <div className="flex items-center space-x-4">
+            <button className="p-2 text-white/60 hover:text-white/90">
+              <Bell className="w-6 h-6" />
+            </button>
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white border border-white/20">
+                {username ? username.charAt(0).toUpperCase() : '?'}
+              </div>
+              <span className="text-white/90">{username}</span>
+            </div>
+          </div>
+        </nav>
+
+        {/* Main Content */}
+        <main className="relative z-10 flex-1 p-8">
+          <div className="max-w-5xl mx-auto">
+            {/* Header */}
+            <div className="flex justify-between items-center mb-8">
+              <div>
+                <h1 className="text-2xl font-semibold text-gray-900">My Loan Applications</h1>
+                <p className="text-gray-500 mt-1">Track and manage your loan requests</p>
+              </div>
+              <button
+                onClick={() => setShowRequestForm(true)}
+                className="h-11 px-6 bg-blue-800 text-white rounded-lg hover:bg-blue-900 transition-all duration-200 font-medium flex items-center shadow-lg shadow-blue-800/20"
+              >
+                <Plus className="w-5 h-5 mr-2" />
+                New Application
+              </button>
+            </div>
+
+            {/* Application Form Modal */}
+            {showRequestForm && (
+              <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+                <div className="bg-white rounded-xl p-6 w-full max-w-md">
+                  <h2 className="text-xl font-semibold mb-4">New Loan Application</h2>
+                  <form onSubmit={handleSubmitRequest}>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Loan Amount
+                        </label>
+                        <input
+                          type="number"
+                          name="amount"
+                          required
+                          className="w-full rounded-lg border border-gray-300 p-2.5"
+                          placeholder="Enter amount"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Purpose
+                        </label>
+                        <textarea
+                          name="purpose"
+                          required
+                          rows={3}
+                          className="w-full rounded-lg border border-gray-300 p-2.5"
+                          placeholder="Briefly describe the purpose of your loan"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex justify-end space-x-3 mt-6">
+                      <button
+                        type="button"
+                        onClick={() => setShowRequestForm(false)}
+                        className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        className="px-4 py-2 text-sm font-medium text-white bg-blue-800 hover:bg-blue-900 rounded-lg"
+                      >
+                        Submit Application
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
+
+            {/* Applications List */}
+            <div className="bg-white/70 backdrop-blur-md rounded-xl border border-white/50 shadow-xl overflow-hidden">
+              <div className="divide-y divide-gray-200/50">
+                {userApplications.map((application) => (
+                  <div key={application.id} className="p-6 hover:bg-white/50 transition-colors">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <div className="flex items-center space-x-3">
+                          <h3 className="text-lg font-medium text-gray-900">
+                            {application.type}
+                          </h3>
+                          <span className={`
+                            inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                            ${application.status === 'approved' ? 'bg-green-100/70 text-green-800 border-2 border-green-300' : 
+                              application.status === 'denied' ? 'bg-red-100/70 text-red-800 border-2 border-red-300' :
+                              'bg-yellow-100/70 text-yellow-800 border-2 border-yellow-300'}
+                          `}>
+                            {application.status.charAt(0).toUpperCase() + application.status.slice(1)}
+                          </span>
+                        </div>
+                        <div className="mt-1 text-sm text-gray-500">
+                          Submitted on {application.submittedDate}
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-4">
+                        <div className="text-lg font-semibold text-gray-900">
+                          ${application.amount.toLocaleString()}
+                        </div>
+                        <button className="px-4 py-2 text-sm font-medium text-blue-800 hover:bg-blue-50/80 rounded-lg transition-colors">
+                          View Details
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="h-screen bg-white overflow-hidden relative">
       {/* Background Blur Elements */}
@@ -26,9 +210,9 @@ const Dashboard = () => {
           </button>
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white border border-white/20">
-              JD
+              {username ? username.charAt(0).toUpperCase() : '?'}
             </div>
-            <span className="text-white/90">John Doe</span>
+            <span className="text-white/90">{username}</span>
           </div>
         </div>
       </nav>
@@ -107,9 +291,6 @@ const Dashboard = () => {
                       </div>
                       <div className="flex items-center space-x-3">
                         <button className="px-4 py-2 text-sm font-medium text-blue-800 hover:bg-blue-50/80 rounded-lg transition-colors">
-                          Review
-                        </button>
-                        <button className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50/80 rounded-lg transition-colors">
                           Details
                         </button>
                       </div>

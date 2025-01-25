@@ -5,14 +5,13 @@ from sklearn.preprocessing import StandardScaler, LabelEncoder
 import numpy as np
 
 # Read the CSV file
-file_path = 'year_2023.csv'
+file_path = 'server/year_2023.csv'
 df = pd.read_csv(file_path, nrows=200000)  # Only read first 1000 rows
 
 # Let's start with a subset of columns for initial testing
 selected_columns = [
     'loan_amount',
     'income',
-    'interest_rate',
     'property_value',
     'debt_to_income_ratio',  # numerical features
     'derived_race',
@@ -30,7 +29,7 @@ print("\nMissing values:")
 print(df.isnull().sum())
 
 # Handle missing values and non-numeric values in numerical columns
-for col in ['loan_amount', 'income', 'interest_rate', 'property_value', 'debt_to_income_ratio']:
+for col in ['loan_amount', 'income', 'property_value', 'debt_to_income_ratio']:
     # Convert non-numeric values to NaN
     df[col] = pd.to_numeric(df[col], errors='coerce')
 
@@ -50,7 +49,7 @@ y = df['action_taken']
 
 # Split categorical and numerical columns
 categorical_columns = ['derived_race', 'derived_sex', 'occupancy_type', 'loan_purpose']
-numerical_columns = ['loan_amount', 'income', 'interest_rate', 'property_value', 'debt_to_income_ratio']
+numerical_columns = ['loan_amount', 'income', 'property_value', 'debt_to_income_ratio']
 
 # Initialize encoders
 label_encoders = {}

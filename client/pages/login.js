@@ -1,8 +1,24 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useRouter } from 'next/router'
 
 const Login = () => {
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const router = useRouter()
+
+  const handleLogin = (e) => {
+    e.preventDefault()
+    if (password === 'password') { 
+      localStorage.setItem('username', username)
+      router.push('/dashboard')
+    } else {
+      alert('Invalid Password.')
+    }
+
+  }
+
   return (
     <div className='flex min-h-screen'>
       {/* Left Section - Enhanced with more prominent gradients */}
@@ -36,13 +52,15 @@ const Login = () => {
 
       {/* Right Section with Login Form */}
       <div className='w-1/2 flex flex-col justify-center items-center bg-gray-50'>
-        <div className='w-[400px] p-8 bg-white rounded-2xl border border-gray-200 shadow-lg flex flex-col justify-center items-center space-y-6'>
+        <form onSubmit={handleLogin} className='w-[400px] p-8 bg-white rounded-2xl border border-gray-200 shadow-lg flex flex-col justify-center items-center space-y-6'>
           <h1 className='text-3xl font-bold text-gray-800'>Welcome Back</h1>
           <p className='text-gray-500 text-sm'>Please enter your credentials to sign in</p>
           
           <input 
             type="text" 
             placeholder='Username' 
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             className='w-full h-12 rounded-lg border border-gray-300 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all'
           />
           
@@ -50,14 +68,16 @@ const Login = () => {
             type="password" 
             placeholder='Password' 
             className='w-full h-12 rounded-lg border border-gray-300 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all'
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
           />
           
-          <Link 
-            href="/dashboard" 
+          <button 
+            type="submit"
             className='flex h-12 w-full bg-blue-800 hover:bg-blue-900 text-white font-semibold rounded-lg transition-all duration-200 justify-center items-center shadow-md hover:shadow-lg transform hover:-translate-y-0.5'
           >
             Sign In
-          </Link>
+          </button>
 
           <div className='flex gap-1 text-sm'>
             <span className='text-gray-500'>Don't have an account?</span>
@@ -65,7 +85,7 @@ const Login = () => {
               Sign up
             </Link>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   )
