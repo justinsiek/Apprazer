@@ -99,69 +99,17 @@ const Dashboard = () => {
                 <h1 className="text-2xl font-semibold text-gray-900">My Loan Applications</h1>
                 <p className="text-gray-500 mt-1">Track and manage your loan requests</p>
               </div>
-              <button
-                onClick={() => setShowRequestForm(true)}
+              <Link
+                href="/apply"
                 className="h-11 px-6 bg-blue-800 text-white rounded-lg hover:bg-blue-900 transition-all duration-200 font-medium flex items-center shadow-lg shadow-blue-800/20"
               >
                 <Plus className="w-5 h-5 mr-2" />
                 New Application
-              </button>
+              </Link>
             </div>
 
-            {/* Application Form Modal */}
-            {showRequestForm && (
-              <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-                <div className="bg-white rounded-xl p-6 w-full max-w-md">
-                  <h2 className="text-xl font-semibold mb-4">New Loan Application</h2>
-                  <form onSubmit={handleSubmitRequest}>
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Loan Amount
-                        </label>
-                        <input
-                          type="number"
-                          name="amount"
-                          required
-                          className="w-full rounded-lg border border-gray-300 p-2.5"
-                          placeholder="Enter amount"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Purpose
-                        </label>
-                        <textarea
-                          name="purpose"
-                          required
-                          rows={3}
-                          className="w-full rounded-lg border border-gray-300 p-2.5"
-                          placeholder="Briefly describe the purpose of your loan"
-                        />
-                      </div>
-                    </div>
-                    <div className="flex justify-end space-x-3 mt-6">
-                      <button
-                        type="button"
-                        onClick={() => setShowRequestForm(false)}
-                        className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg"
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        type="submit"
-                        className="px-4 py-2 text-sm font-medium text-white bg-blue-800 hover:bg-blue-900 rounded-lg"
-                      >
-                        Submit Application
-                      </button>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            )}
-
             {/* Applications List */}
-            <div className="bg-white/70 backdrop-blur-md rounded-xl border border-white/50 shadow-xl overflow-hidden">
+            <div className="bg-white/70 backdrop-blur-md rounded-xl border-2 border-blue-800/20 shadow-xl overflow-hidden">
               <div className="divide-y divide-gray-200/50">
                 {userApplications.map((application) => (
                   <div key={application.lid} className="p-6 hover:bg-white/50 transition-colors">
@@ -235,32 +183,36 @@ const Dashboard = () => {
       {/* Main Content */}
       <main className="relative z-10 flex-1 p-8 overflow-hidden">
         {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
+        <div className="flex items-center space-x-8 mb-8">
+          <div className="shrink-0">
             <h1 className="text-2xl font-semibold text-gray-900">Loan Approval Dashboard</h1>
             <p className="text-gray-500 mt-1">Manage and track home loan applications</p>
           </div>
-          <div className="flex space-x-4">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search applications..."
-                className="w-72 h-11 pl-11 pr-4 rounded-lg border border-white/50 bg-white/70 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          <div className="relative flex-1">
+            <input
+              type="text"
+              placeholder="Search applications..."
+              className="w-full h-12 pl-12 pr-4 rounded-xl border-2 border-blue-800/20 bg-white/70 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-lg shadow-blue-900/5 text-gray-900 placeholder-gray-500"
+            />
+            <svg 
+              className="w-5 h-5 text-gray-400 absolute left-4 top-1/2 transform -translate-y-1/2" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth={2} 
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" 
               />
-              <svg className="w-5 h-5 text-gray-400 absolute left-4 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
-            <button className="h-11 px-6 bg-blue-800 text-white rounded-lg hover:bg-blue-900 transition-all duration-200 font-medium flex items-center shadow-lg shadow-blue-800/20">
-              <Plus className="w-5 h-5 mr-2" />
-              New Request
-            </button>
+            </svg>
           </div>
         </div>
 
         {/* Grid Container */}
         <div className="grid grid-cols-3 gap-8 h-[calc(100vh-232px)]">
-          <div className="col-span-2 rounded-xl border border-white/50 bg-white/70 backdrop-blur-md shadow-xl overflow-hidden flex flex-col">
+          <div className="col-span-2 rounded-xl border-2 border-blue-800/20 bg-white/70 backdrop-blur-md shadow-xl overflow-hidden flex flex-col">
             <div className="p-6 border-b border-gray-200/50 bg-white/80">
               <div className="flex justify-between items-center">
                 <div>
@@ -317,12 +269,12 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="flex flex-col justify-between bg-white/70 backdrop-blur-md rounded-xl border border-white/50 shadow-xl p-6 overflow-hidden">
+          <div className="flex flex-col justify-between bg-white/70 backdrop-blur-md rounded-xl border-2 border-blue-800/20 shadow-xl p-6 overflow-hidden">
             <h2 className="text-lg font-semibold text-gray-900 mb-2">Analytics Overview</h2>
             <p className="text-gray-500 text-sm mb-6">Performance metrics for the last 30 days</p>
             
             {/* Money Metric */}
-            <div className="mb-8 p-5 bg-gradient-to-br from-blue-50/80 to-blue-100/50 backdrop-blur-sm rounded-xl border-2 border-blue-200 shadow-sm">
+            <div className="mb-8 p-5 bg-gradient-to-br from-blue-50/80 to-blue-100/50 backdrop-blur-sm rounded-xl border-2 border-blue-800/20 shadow-sm">
               <p className="text-sm font-medium text-blue-800 mb-1">Total Loan Value</p>
               <div className="flex items-baseline">
                 <span className="text-3xl font-bold text-gray-900">
@@ -334,44 +286,64 @@ const Dashboard = () => {
             {/* Circular Progress */}
             <div className="flex justify-center mb-8">
               <div className="relative w-44 h-44">
-                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                  <path
-                    d="M 50,50 m 0,-45 a 45,45 0 1 1 0,90 a 45,45 0 1 1 0,-90"
-                    fill="none"
-                    stroke="#EFF6FF"
-                    strokeWidth="10"
-                  />
-                  <path
-                    d="M 50,50 m 0,-45 a 45,45 0 1 1 0,90 a 45,45 0 1 1 0,-90"
-                    fill="none"
-                    stroke="url(#blue-gradient)"
-                    strokeWidth="10"
-                    strokeLinecap="round"
-                    strokeDasharray={`${85.5 * 2.83} ${100 * 2.83}`}
-                  />
-                  <defs>
-                    <linearGradient id="blue-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#2563EB" />
-                      <stop offset="100%" stopColor="#1E40AF" />
-                    </linearGradient>
-                  </defs>
-                </svg>
-                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-3xl font-bold text-gray-900">85.5%</span>
-                  <span className="text-sm font-medium text-blue-800">Approval Rate</span>
-                </div>
+                {(() => {
+                  const approved = userApplications.filter(app => app.status === 1).length;
+                  const denied = userApplications.filter(app => app.status === 2).length;
+                  const total = approved + denied;
+                  const approvalRate = total > 0 ? (approved / total) * 100 : 0;
+                  const circumference = 2 * Math.PI * 45; // 45 is the radius
+                  const dashArray = `${(approvalRate / 100) * circumference} ${circumference}`;
+                  
+                  return (
+                    <>
+                      <svg className="w-full h-full rotate-[180]" viewBox="0 0 100 100">
+                        <circle
+                          cx="50"
+                          cy="50"
+                          r="45"
+                          fill="none"
+                          stroke="#EFF6FF"
+                          strokeWidth="10"
+                        />
+                        <circle
+                          cx="50"
+                          cy="50"
+                          r="45"
+                          fill="none"
+                          stroke="url(#blue-gradient)"
+                          strokeWidth="10"
+                          strokeLinecap="round"
+                          strokeDasharray={dashArray}
+                          transform="rotate(-90 50 50)"
+                        />
+                        <defs>
+                          <linearGradient id="blue-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stopColor="#2563EB" />
+                            <stop offset="100%" stopColor="#1E40AF" />
+                          </linearGradient>
+                        </defs>
+                      </svg>
+                      <div className="absolute inset-0 flex flex-col items-center justify-center">
+                        <span className="text-3xl font-bold text-gray-900">
+                          {approvalRate.toFixed(1)}%
+                        </span>
+                        <span className="text-sm font-medium text-blue-800">Approval Rate</span>
+                      </div>
+                    </>
+                  );
+                })()}
               </div>
             </div>
 
             {/* Stats Grid */}
             <div className="grid grid-cols-2 gap-4 mb-2">
-              <div className="p-4 bg-gray-50/80 backdrop-blur-sm rounded-xl border-2 border-gray-200 shadow-sm">
+              <div className="p-4 bg-gray-50/80 backdrop-blur-sm rounded-xl border-2 border-blue-800/20 shadow-sm">
                 <p className="text-sm font-medium text-gray-800 mb-1">Approved</p>
                 <p className="text-2xl font-semibold text-gray-900">
                   {userApplications.filter(app => app.status === 1).length}
                 </p>
               </div>
-              <div className="p-4 bg-gray-50/80 backdrop-blur-sm rounded-xl border-2 border-gray-200 shadow-sm">
+              <div className="p-4 bg-gray-50/80 backdrop-blur-sm rounded-xl border-2 border-blue-800/20 shadow-sm">
                 <p className="text-sm font-medium text-gray-800 mb-1">Denied</p>
                 <p className="text-2xl font-semibold text-gray-900">
                   {userApplications.filter(app => app.status === 2).length}

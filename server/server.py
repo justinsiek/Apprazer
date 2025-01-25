@@ -56,10 +56,6 @@ def upload_file():
     if not username:
         return jsonify({'error': 'Username is required'}), 400
     
-    
-    print(f"Received username: {username}")
-    '''
-
     file = request.files['file']
     if file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
@@ -72,17 +68,42 @@ def upload_file():
             os.makedirs('temp', exist_ok=True)
             file.save(temp_path)
             
-            # Process with Aryn using helper function
-            # result = process_with_aryn(temp_path)
+            # Insert dummy loan data
+            conn = sqlite3.connect('loandb.db')
+            cursor = conn.cursor()
+            
+            # Dummy data with random but realistic values
+            loan_data = (
+                username,           # username
+                400000,            # loan_amount
+                2000,             # income
+                500000,            # property_value
+                0.28,              # debt_to_income_ratio
+                1,                 # derived_race (1 = White)
+                1,                 # derived_sex (1 = Male)
+                1,                 # occupancy_type (1 = Primary Residence)
+                1,                 # loan_purpose (1 = Home Purchase)
+                0,                 # action_taken (0 = Pending)
+                0                  # status (0 = Pending)
+            )
+            
+            cursor.execute("""
+                INSERT INTO loan (
+                    username, loan_amount, income, property_value, 
+                    debt_to_income_ratio, derived_race, derived_sex,
+                    occupancy_type, loan_purpose, action_taken, status
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, loan_data)
+            
+            conn.commit()
+            conn.close()
             
             # Clean up temp file
             os.remove(temp_path)
             
-            # Include username in response
             return jsonify({
                 'message': 'File processed successfully',
-                'username': username,
-                # 'result': result
+                'username': username
             }), 200
             
         except Exception as e:
@@ -90,7 +111,7 @@ def upload_file():
             return jsonify({'error': 'Error processing file'}), 500
     
     return jsonify({'error': 'File type not allowed'}), 400
-    '''
+
 @app.route('/api/retrieve_loans', methods=['GET'])
 def retrieve_loans():
     try:
@@ -101,11 +122,11 @@ def retrieve_loans():
         conn = sqlite3.connect('loandb.db')
         cursor = conn.cursor()
         
-        # Modify query to filter by username if provided
+        # Modify query to filter by username if provided and sort by created_at DESC
         if username and username.lower() != 'admin':
-            cursor.execute("SELECT * FROM loan WHERE username = ?", (username,))
+            cursor.execute("SELECT * FROM loan WHERE username = ? ORDER BY created_at DESC", (username,))
         else:
-            cursor.execute("SELECT * FROM loan")  # Admin sees all loans
+            cursor.execute("SELECT * FROM loan ORDER BY created_at DESC")  # Admin sees all loans
         
         # Get column names from cursor description
         columns = [description[0] for description in cursor.description]
