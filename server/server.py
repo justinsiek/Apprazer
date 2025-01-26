@@ -7,6 +7,7 @@ import fitz  # PyMuPDF
 import cv2
 import numpy as np
 import pytesseract
+from loan_model import predict_loan  # Add this import at the top with other imports
 
 
 # Flask app setup
@@ -83,7 +84,7 @@ def process_image(file_path):
                 
                 # If average pixel value is closer to black (0) than white (255)
                 threshold = 128  # Midpoint between black and white
-                value = 1 if avg_pixel_value < threshold else 2  # 1 for Purchase, 2 for Refinance
+                value = 1 if avg_pixel_value < threshold else 31  # 1 for Purchase, 2 for Refinance
                 print(f"Loan purpose value: {value} ({'Purchase' if value == 1 else 'Refinance'})")
                 extracted_data[field_name] = int(value)  # Ensure it's an integer
                 
@@ -163,8 +164,24 @@ def upload_file():
             derived_race = 1
             derived_sex = 1
             occupancy_type = 1
-            action_taken = 0
-            status = 0
+            
+            # Prepare loan data for prediction
+            loan_data_for_prediction = {
+                'loan_amount': loan_amount,
+                'income': monthly_income,
+                'property_value': property_value,
+                'debt_to_income_ratio': debt_to_income_ratio,
+                'derived_race': derived_race,
+                'derived_sex': derived_sex,
+                'occupancy_type': occupancy_type,
+                'loan_purpose': loan_purpose
+            }
+            
+            # Get prediction
+            approval_probability = predict_loan(loan_data_for_prediction)
+            # Convert probability to action_taken (0 for denied, 1 for approved)
+            action_taken = 1 if approval_probability >= 0.5 else 0
+            status = action_taken
             
             # Insert loan data
             conn = sqlite3.connect('loandb.db')
@@ -179,7 +196,7 @@ def upload_file():
                 derived_race,
                 derived_sex,
                 occupancy_type,
-                loan_purpose,  # 1 = Purchase, 2 = Refinance
+                loan_purpose,
                 action_taken,
                 status
             )
@@ -194,6 +211,8 @@ def upload_file():
             
             conn.commit()
             conn.close()
+
+            print("Loan data:", loan_data)
             
             # Clean up temp file
             os.remove(temp_path)
