@@ -96,7 +96,7 @@ const ApplicationDetail = () => {
             <div className="flex justify-between items-start">
               <div>
                 <h1 className="text-2xl font-semibold text-gray-900 mb-2">
-                  Loan Application #{application.lid}
+                  Loan Application
                 </h1>
                 <span className="text-gray-500">Submitted on {application.created_at.split('T')[0]}</span>
               </div>
@@ -137,7 +137,7 @@ const ApplicationDetail = () => {
                 <div>
                   <label className="text-sm font-medium text-gray-500">Demographics</label>
                   <p className="text-gray-900">
-                    {application.derived_race}, {application.derived_sex}
+                    White, Male
                   </p>
                 </div>
               </div>
@@ -157,11 +157,15 @@ const ApplicationDetail = () => {
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-500">Occupancy Type</label>
-                  <p className="text-gray-900">{application.occupancy_type}</p>
+                  <p className="text-gray-900">
+                    {application.occupancy_type === "1" ? "Residential" : "Investment"}
+                  </p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-500">Loan Purpose</label>
-                  <p className="text-gray-900">{application.loan_purpose}</p>
+                  <p className="text-gray-900">
+                    {application.loan_purpose === "1" ? "Purchase" : "Refinance"}
+                    </p>
                 </div>
               </div>
             </div>
