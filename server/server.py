@@ -2,15 +2,16 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 import sqlite3
 import os
-from aryn_sdk.partition import partition_file
 from werkzeug.utils import secure_filename
+import fitz  # PyMuPDF
+import cv2
+import numpy as np
+import pytesseract
+
 
 # Flask app setup
 app = Flask(__name__)
 CORS(app)
-
-# Configure Aryn API key
-os.environ['ARYN_API_KEY'] = "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJzdWIiOnsiZW1sIjoibXVoaXJ3ZWpAdWNpLmVkdSIsImFjdCI6IjQ3ODQyODE0MDcyMiJ9LCJpYXQiOjE3Mzc3ODIxNDB9._tnOlKs7grs-UccASlKHIUCT3ew8MYIA8u_ut6cuggY2nY6Gc5KSF7Ek9LQLWLeK1RCmQF-flkUUNNLlgD73DA"
 
 # Allowable file extensions
 ALLOWED_EXTENSIONS = {'pdf'}
@@ -19,32 +20,81 @@ ALLOWED_EXTENSIONS = {'pdf'}
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def process_with_aryn(file_path):
-    """
-    Process a file with Aryn SDK and return the results
+def process_image(file_path):
+    # Set Tesseract path for Windows
+    pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
     
-    Args:
-        file_path (str): Path to the file to be processed
-        
-    Returns:
-        dict: Results from Aryn processing
-        
-    Raises:
-        Exception: If processing fails
-    """
-    try:
-        result = partition_file(file_path)
-        
-        # Print the results for debugging
-        print("Aryn Processing Results:")
-        print("-" * 50)
-        print(result)
-        print("-" * 50)
-        
-        return result
-    except Exception as e:
-        print(f"Error in Aryn processing: {str(e)}")
-        raise
+    pdf_document = fitz.open(file_path)
+    print(f"Total pages in PDF: {len(pdf_document)}")
+    extracted_data = {}
+    
+    # Define extraction coordinates for each field on each page
+    fields = {
+        'monthly_income': (0, 0.575, 0.88, 0.06, 0.013),  # Page 1
+        'property_value': (3, 0.07, 0.209, 0.07, 0.013),  # Page 4 (index 3)
+    }
+    
+    for field_name, (page_num, left_ratio, top_ratio, width_ratio, height_ratio) in fields.items():
+        try:
+            print(f"\nProcessing {field_name} on page {page_num + 1}")
+            # Get the specified page
+            page = pdf_document[page_num]
+            
+            # Convert page to image
+            pix = page.get_pixmap(matrix=fitz.Matrix(2, 2))
+            img = np.frombuffer(pix.samples, dtype=np.uint8).reshape(
+                pix.height, pix.width, pix.n
+            )
+            
+            # Calculate ROI coordinates
+            height, width = img.shape[:2]
+            roi_x = int(width * left_ratio)
+            roi_y = int(height * top_ratio)
+            roi_w = int(width * width_ratio)
+            roi_h = int(height * height_ratio)
+            
+            # Create a copy of the full page and draw rectangle for visualization
+            full_page_with_rect = img.copy()
+            cv2.rectangle(full_page_with_rect, 
+                         (roi_x, roi_y), 
+                         (roi_x + roi_w, roi_y + roi_h), 
+                         (0, 255, 0), 2)  # Green rectangle
+            
+            # Save the full page with rectangle
+            os.makedirs('debug', exist_ok=True)
+            cv2.imwrite(f'debug/{field_name}_full_page.png', full_page_with_rect)
+            
+            # Extract the ROI
+            roi = img[roi_y:roi_y+roi_h, roi_x:roi_x+roi_w]
+            
+            # Enhance the image
+            gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+            _, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+            
+            # Save ROI
+            cv2.imwrite(f'debug/{field_name}_roi.png', thresh)
+            
+            # Extract text
+            text = pytesseract.image_to_string(thresh, config='--psm 7')
+            text = text.strip()
+            print(f"Extracted {field_name}: {text}")
+            
+            # Convert to number if it's a numeric field
+            if field_name in ['monthly_income', 'property_value']:
+                text = text.replace('$', '').replace(',', '')
+                value = float(text)
+            else:
+                value = text
+                
+            extracted_data[field_name] = value
+            
+        except Exception as e:
+            print(f"Error extracting {field_name}: {str(e)}")
+            extracted_data[field_name] = None
+    
+    pdf_document.close()
+    return extracted_data
+    
 
 @app.route('/api/upload', methods=['POST'])
 def upload_file():
@@ -67,24 +117,43 @@ def upload_file():
             temp_path = os.path.join('temp', filename)
             os.makedirs('temp', exist_ok=True)
             file.save(temp_path)
+            file.close()
+
+            # Process the file
+            extracted_data = process_image(temp_path)
+            print(f"Extracted data: {extracted_data}")
+
+            # Validate extracted data
+            if None in extracted_data.values():
+                return jsonify({'error': 'Could not extract valid data from document'}), 400
+
+            # Use extracted data for loan processing
+            loan_amount = 400000  # You might want to calculate this based on income
+            property_value = extracted_data['property_value']
+            debt_to_income_ratio = 0.28  # You might want to calculate this using income
+            derived_race = 1
+            derived_sex = 1
+            occupancy_type = 1
+            loan_purpose = 1
+            action_taken = 0
+            status = 0
             
             # Insert dummy loan data
             conn = sqlite3.connect('loandb.db')
             cursor = conn.cursor()
             
-            # Dummy data with random but realistic values
             loan_data = (
                 username,           # username
-                400000,            # loan_amount
-                2000,             # income
-                500000,            # property_value
-                0.28,              # debt_to_income_ratio
-                1,                 # derived_race (1 = White)
-                1,                 # derived_sex (1 = Male)
-                1,                 # occupancy_type (1 = Primary Residence)
-                1,                 # loan_purpose (1 = Home Purchase)
-                0,                 # action_taken (0 = Pending)
-                0                  # status (0 = Pending)
+                loan_amount,       # loan_amount
+                extracted_data['monthly_income'],            # income
+                property_value,    # property_value
+                debt_to_income_ratio, # debt_to_income_ratio
+                derived_race,      # derived_race (1 = White)
+                derived_sex,       # derived_sex (1 = Male)
+                occupancy_type,    # occupancy_type (1 = Primary Residence)
+                loan_purpose,      # loan_purpose (1 = Home Purchase)
+                action_taken,      # action_taken (0 = Pending)
+                status             # status (0 = Pending)
             )
             
             cursor.execute("""
