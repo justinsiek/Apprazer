@@ -9,29 +9,34 @@ const Dashboard = () => {
   const [showRequestForm, setShowRequestForm] = useState(false);
   const [userApplications, setUserApplications] = useState([]);
 
+  // Add polling interval state
+  const [pollingInterval, setPollingInterval] = useState(null);
+
   useEffect(() => {
     const storedUsername = localStorage.getItem('username') || '';
     setUsername(storedUsername);
     setIsAdmin(storedUsername.toLowerCase() === 'admin');
 
-    // Only fetch loans if we have a username
+    // Start polling when component mounts
     if (storedUsername) {
-      const fetchLoans = async () => {
-        try {
-          const response = await fetch(`http://localhost:5000/api/retrieve_loans?username=${storedUsername}`);
-          if (!response.ok) {
-            throw new Error('Failed to fetch loans');
-          }
-          const data = await response.json();
-          setUserApplications(data.loans);
-        } catch (error) {
-          console.error('Error fetching loans:', error);
-        }
-      };
+      fetchApplicationDetails(); // Initial fetch
+      
+      // Set up polling every 5 seconds
+      const interval = setInterval(() => {
+        fetchApplicationDetails();
+      }, 5000);
 
-      fetchLoans();
+      // Store interval ID
+      setPollingInterval(interval);
     }
-  }, [username]);
+
+    // Cleanup function to clear interval when component unmounts
+    return () => {
+      if (pollingInterval) {
+        clearInterval(pollingInterval);
+      }
+    };
+  }, [username]); // Only re-run when username changes
 
   const handleSubmitRequest = (e) => {
     e.preventDefault();
@@ -60,7 +65,7 @@ const Dashboard = () => {
 
   const fetchApplicationDetails = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/retrieve_loans?username=${username}`);
+      const response = await fetch(`http://172.20.10.5:5000/api/retrieve_loans?username=${username}`);
       if (!response.ok) {
         throw new Error('Failed to fetch loans');
       }

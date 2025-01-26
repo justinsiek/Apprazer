@@ -50,7 +50,7 @@ const Apply = () => {
     formData.append('username', username);
 
     try {
-      const response = await fetch('http://localhost:5000/api/upload', {
+      const response = await fetch('http://172.20.10.5:5000/api/upload', {
         method: 'POST',
         body: formData,
       });

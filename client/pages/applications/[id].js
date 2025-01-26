@@ -23,7 +23,7 @@ const ApplicationDetail = () => {
 
   const fetchApplicationDetails = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/retrieve_loans?username=${localStorage.getItem('username')}`);
+      const response = await fetch(`http://172.20.10.5:5000/api/retrieve_loans?username=${localStorage.getItem('username')}`);
       if (!response.ok) {
         throw new Error('Failed to fetch application details');
       }
