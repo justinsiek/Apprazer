@@ -136,9 +136,12 @@ const Dashboard = () => {
                         <div className="text-lg font-semibold text-gray-900">
                           ${Number(application.loan_amount).toLocaleString()}
                         </div>
-                        <button className="px-4 py-2 text-sm font-medium text-blue-800 hover:bg-blue-50/80 rounded-lg transition-colors">
+                        <Link 
+                          href={`/applications/${application.lid}`} 
+                          className="px-4 py-2 text-sm font-medium text-blue-800 hover:bg-blue-50/80 rounded-lg transition-colors"
+                        >
                           View Details
-                        </button>
+                        </Link>
                       </div>
                     </div>
                   </div>
@@ -258,9 +261,12 @@ const Dashboard = () => {
                         </div>
                       </div>
                       <div className="flex items-center space-x-3">
-                        <button className="px-4 py-2 text-sm font-medium text-blue-800 hover:bg-blue-50/80 rounded-lg transition-colors">
-                          Details
-                        </button>
+                        <Link 
+                          href={`/applications/${application.lid}`} 
+                          className="px-4 py-2 text-sm font-medium text-blue-800 hover:bg-blue-50/80 rounded-lg transition-colors"
+                        >
+                          View Details
+                        </Link>
                       </div>
                     </div>
                   </div>
