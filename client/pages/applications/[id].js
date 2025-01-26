@@ -98,20 +98,20 @@ const ApplicationDetail = () => {
                 <h1 className="text-2xl font-semibold text-gray-900 mb-2">
                   Loan Application #{application.lid}
                 </h1>
-                <div className="flex items-center space-x-3">
-                  <span className="text-gray-500">Submitted on {application.created_at.split('T')[0]}</span>
-                  <span className={`
-                    inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                    ${getStatusText(application.status) === 'approved' ? 'bg-green-100/70 text-green-800 border-2 border-green-300' : 
-                      getStatusText(application.status) === 'denied' ? 'bg-red-100/70 text-red-800 border-2 border-red-300' :
-                      'bg-yellow-100/70 text-yellow-800 border-2 border-yellow-300'}
-                  `}>
-                    {getStatusText(application.status).charAt(0).toUpperCase() + getStatusText(application.status).slice(1)}
-                  </span>
-                </div>
+                <span className="text-gray-500">Submitted on {application.created_at.split('T')[0]}</span>
               </div>
-              <div className="text-2xl font-bold text-gray-900">
-                ${Number(application.loan_amount).toLocaleString()}
+              <div className="text-right">
+                <div className="text-2xl font-bold text-gray-900 mb-2">
+                  ${Number(application.loan_amount).toLocaleString()}
+                </div>
+                <span className={`
+                  inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                  ${getStatusText(application.status) === 'approved' ? 'bg-green-100/70 text-green-800 border-2 border-green-300' : 
+                    getStatusText(application.status) === 'denied' ? 'bg-red-100/70 text-red-800 border-2 border-red-300' :
+                    'bg-yellow-100/70 text-yellow-800 border-2 border-yellow-300'}
+                `}>
+                  {getStatusText(application.status).charAt(0).toUpperCase() + getStatusText(application.status).slice(1)}
+                </span>
               </div>
             </div>
           </div>
