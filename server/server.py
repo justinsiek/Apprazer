@@ -31,6 +31,7 @@ def process_image(file_path):
     # Define extraction coordinates for each field on each page
     fields = {
         'monthly_income': (0, 0.575, 0.88, 0.06, 0.013),  # Page 1
+        'debt': (2, 0.67, 0.653, 0.06, 0.013),  # Page 3
         'loan_amount': (4, 0.166, 0.122, 0.07, 0.013),  # Page 4 (index 3)
         'property_value': (4, 0.479, 0.175, 0.07, 0.013),  # Page 4 (index 3)
     }
@@ -78,10 +79,9 @@ def process_image(file_path):
             # Extract text
             text = pytesseract.image_to_string(thresh, config='--psm 7')
             text = text.strip()
-            print(f"Extracted {field_name}: {text}")
             
             # Convert to number if it's a numeric field
-            if field_name in ['monthly_income', 'loan_amount', 'property_value']:
+            if field_name in ['monthly_income', 'loan_amount', 'property_value', 'debt']:
                 text = text.replace('$', '').replace(',', '')
                 value = float(text)
             else:
@@ -128,7 +128,7 @@ def upload_file():
                 return jsonify({'error': 'Could not extract valid data from document'}), 400
 
             # Use extracted data for loan processing
-            debt_to_income_ratio = 0.28  # You might want to calculate this using income
+            debt_to_income_ratio = round(extracted_data['debt'] / extracted_data['monthly_income'], 2)
             derived_race = 1
             derived_sex = 1
             occupancy_type = 1
