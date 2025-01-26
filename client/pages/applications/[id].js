@@ -23,17 +23,28 @@ const ApplicationDetail = () => {
 
   const fetchApplicationDetails = async () => {
     try {
-      const response = await fetch(`http://172.20.10.5:5000/api/retrieve_loans?username=${localStorage.getItem('username')}`);
+      const endpoint = isAdmin ? 'retrieve_admin_loans' : 'retrieve_user_loans';
+      const response = await fetch(`http://172.20.10.5:5000/api/${endpoint}?username=${localStorage.getItem('username')}`);
+      
       if (!response.ok) {
         throw new Error('Failed to fetch application details');
       }
       const data = await response.json();
       const applicationDetail = data.loans.find(loan => loan.lid === parseInt(id));
+      
+      if (!applicationDetail) {
+        console.error('Application not found');
+        return;
+      }
+      
       setApplication(applicationDetail);
     } catch (error) {
       console.error('Error fetching application details:', error);
     }
   };
+
+  console.log('Current application:', application);
+  console.log('Current ID:', id);
 
   const getStatusText = (statusCode) => {
     switch (statusCode) {
@@ -65,7 +76,7 @@ const ApplicationDetail = () => {
   };
 
   if (!application) {
-    return <div/>;
+    return <div>Loading...</div>;
   }
 
   return (

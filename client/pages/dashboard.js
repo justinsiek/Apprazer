@@ -65,7 +65,10 @@ const Dashboard = () => {
 
   const fetchApplicationDetails = async () => {
     try {
-      const response = await fetch(`http://172.20.10.5:5000/api/retrieve_loans?username=${username}`);
+      // Use different endpoints based on user type
+      const endpoint = isAdmin ? 'retrieve_admin_loans' : 'retrieve_user_loans';
+      const response = await fetch(`http://172.20.10.5:5000/api/${endpoint}?username=${username}`);
+      
       if (!response.ok) {
         throw new Error('Failed to fetch loans');
       }

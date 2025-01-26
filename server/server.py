@@ -229,21 +229,60 @@ def upload_file():
     
     return jsonify({'error': 'File type not allowed'}), 400
 
-@app.route('/api/retrieve_loans', methods=['GET'])
-def retrieve_loans():
+@app.route('/api/retrieve_user_loans', methods=['GET'])
+def retrieve_user_loans():
     try:
         # Get username from query parameters
         username = request.args.get('username')
         
+        if not username:
+            return jsonify({'error': 'Username is required'}), 400
+            
         # Connect to the database
         conn = sqlite3.connect('loandb.db')
         cursor = conn.cursor()
         
-        # Modify query to filter by username if provided and sort by created_at DESC
-        if username and username.lower() != 'admin':
-            cursor.execute("SELECT * FROM loan WHERE username = ? ORDER BY created_at DESC", (username,))
-        else:
-            cursor.execute("SELECT * FROM loan ORDER BY created_at DESC")  # Admin sees all loans
+        # Query only user's loans
+        cursor.execute("SELECT * FROM loan WHERE username = ? ORDER BY created_at DESC", (username,))
+        
+        # Get column names from cursor description
+        columns = [description[0] for description in cursor.description]
+        
+        # Fetch all rows
+        loans = cursor.fetchall()
+        
+        # Convert to list of dictionaries for JSON serialization
+        loans_list = []
+        for loan in loans:
+            loan_dict = dict(zip(columns, loan))
+            loans_list.append(loan_dict)
+            
+        conn.close()
+
+        return jsonify({
+            'message': 'Loans retrieved successfully',
+            'loans': loans_list
+        }), 200
+        
+    except Exception as e:
+        print(f"Error retrieving loans: {str(e)}")
+        return jsonify({'error': 'Error retrieving loans'}), 500
+
+@app.route('/api/retrieve_admin_loans', methods=['GET'])
+def retrieve_admin_loans():
+    try:
+        # Get username from query parameters for verification
+        username = request.args.get('username')
+        
+        if not username or username.lower() != 'admin':
+            return jsonify({'error': 'Unauthorized access'}), 403
+            
+        # Connect to the database
+        conn = sqlite3.connect('loandb.db')
+        cursor = conn.cursor()
+        
+        # Get all loans for admin
+        cursor.execute("SELECT * FROM loan ORDER BY created_at DESC")
         
         # Get column names from cursor description
         columns = [description[0] for description in cursor.description]
