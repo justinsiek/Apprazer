@@ -34,6 +34,7 @@ def process_image(file_path):
         'debt': (2, 0.67, 0.653, 0.06, 0.013),  # Page 3
         'loan_amount': (4, 0.166, 0.122, 0.07, 0.013),  # Page 4 (index 3)
         'property_value': (4, 0.479, 0.175, 0.07, 0.013),  # Page 4 (index 3)
+        'loan_purpose': (4, 0.4735, 0.127, 0.005, 0.005),  # Page 4 (index 3)
     }
     
     for field_name, (page_num, left_ratio, top_ratio, width_ratio, height_ratio) in fields.items():
@@ -60,7 +61,7 @@ def process_image(file_path):
             cv2.rectangle(full_page_with_rect, 
                          (roi_x, roi_y), 
                          (roi_x + roi_w, roi_y + roi_h), 
-                         (0, 255, 0), 2)  # Green rectangle
+                         (0, 255, 0), 2)
             
             # Save the full page with rectangle
             os.makedirs('debug', exist_ok=True)
@@ -69,25 +70,44 @@ def process_image(file_path):
             # Extract the ROI
             roi = img[roi_y:roi_y+roi_h, roi_x:roi_x+roi_w]
             
-            # Enhance the image
-            gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
-            _, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-            
-            # Save ROI
-            cv2.imwrite(f'debug/{field_name}_roi.png', thresh)
-            
-            # Extract text
-            text = pytesseract.image_to_string(thresh, config='--psm 7')
-            text = text.strip()
-            
-            # Convert to number if it's a numeric field
-            if field_name in ['monthly_income', 'loan_amount', 'property_value', 'debt']:
-                text = text.replace('$', '').replace(',', '')
-                value = float(text)
-            else:
-                value = text
+            if field_name == 'loan_purpose':
+                # Convert to grayscale
+                gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
                 
-            extracted_data[field_name] = value
+                # Calculate the average pixel value (0-255, where 0 is black and 255 is white)
+                avg_pixel_value = np.mean(gray)
+                print(f"Average pixel value: {avg_pixel_value}")
+                
+                # Save ROI for debugging
+                cv2.imwrite(f'debug/{field_name}_roi.png', gray)
+                
+                # If average pixel value is closer to black (0) than white (255)
+                threshold = 128  # Midpoint between black and white
+                value = 1 if avg_pixel_value < threshold else 2  # 1 for Purchase, 2 for Refinance
+                print(f"Loan purpose value: {value} ({'Purchase' if value == 1 else 'Refinance'})")
+                extracted_data[field_name] = int(value)  # Ensure it's an integer
+                
+            else:
+                # Regular OCR processing for other fields
+                gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+                _, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+                
+                # Save ROI
+                cv2.imwrite(f'debug/{field_name}_roi.png', thresh)
+                
+                # Extract text
+                text = pytesseract.image_to_string(thresh, config='--psm 7')
+                text = text.strip()
+                print(f"Extracted {field_name}: {text}")
+                
+                # Convert to number if it's a numeric field
+                if field_name in ['monthly_income', 'property_value', 'loan_amount']:
+                    text = text.replace('$', '').replace(',', '')
+                    value = float(text)
+                else:
+                    value = text
+                    
+                extracted_data[field_name] = value
             
         except Exception as e:
             print(f"Error extracting {field_name}: {str(e)}")
@@ -122,36 +142,46 @@ def upload_file():
 
             # Process the file
             extracted_data = process_image(temp_path)
+            print("Extracted data:", extracted_data)  # Debug print
 
             # Validate extracted data
             if None in extracted_data.values():
                 return jsonify({'error': 'Could not extract valid data from document'}), 400
 
+            # Ensure numeric values are floats
+            monthly_income = float(extracted_data['monthly_income'])
+            debt = float(extracted_data['debt'])
+            loan_amount = float(extracted_data['loan_amount'])
+            property_value = float(extracted_data['property_value'])
+            loan_purpose = int(extracted_data['loan_purpose'])
+
+            # Calculate debt-to-income ratio
+            debt_to_income_ratio = round(debt / monthly_income, 2)
+            print(f"Debt: {debt}, Income: {monthly_income}, Ratio: {debt_to_income_ratio}")  # Debug print
+
             # Use extracted data for loan processing
-            debt_to_income_ratio = round(extracted_data['debt'] / extracted_data['monthly_income'], 2)
             derived_race = 1
             derived_sex = 1
             occupancy_type = 1
-            loan_purpose = 1
             action_taken = 0
             status = 0
             
-            # Insert dummy loan data
+            # Insert loan data
             conn = sqlite3.connect('loandb.db')
             cursor = conn.cursor()
             
             loan_data = (
-                username,           # username
-                extracted_data['loan_amount'],       # loan_amount
-                extracted_data['monthly_income'],    # income
-                extracted_data['property_value'],    # property_value
-                debt_to_income_ratio, # debt_to_income_ratio
-                derived_race,      # derived_race (1 = White)
-                derived_sex,       # derived_sex (1 = Male)
-                occupancy_type,    # occupancy_type (1 = Primary Residence)
-                loan_purpose,      # loan_purpose (1 = Home Purchase)
-                action_taken,      # action_taken (0 = Pending)
-                status             # status (0 = Pending)
+                username,
+                loan_amount,
+                monthly_income,
+                property_value,
+                debt_to_income_ratio,
+                derived_race,
+                derived_sex,
+                occupancy_type,
+                loan_purpose,  # 1 = Purchase, 2 = Refinance
+                action_taken,
+                status
             )
             
             cursor.execute("""
@@ -170,7 +200,8 @@ def upload_file():
             
             return jsonify({
                 'message': 'File processed successfully',
-                'username': username
+                'username': username,
+                'extracted_data': extracted_data  # Return extracted data in response
             }), 200
             
         except Exception as e:
