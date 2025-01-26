@@ -30,12 +30,12 @@ def seed_tables(conn: sqlite3.Connection):
     # action_taken: 1 = Approved, 2 = Denied
     seed_loans = [
         # username, loan_amount, income, property_value, debt_ratio, race, sex, occupancy, purpose, action, status
-        ("Jane Doe", 350000, 95000, 400000, 0.28, 1, 2, 1, 1, 1, 1),
-        ("Jane Doe", 275000, 85000, 300000, 0.32, 1, 2, 1, 2, 2, 2),
-        ("John Doe", 425000, 115000, 500000, 0.25, 3, 1, 1, 1, 1, 1),
-        ("John Doe", 180000, 65000, 200000, 0.38, 3, 1, 3, 3, 2, 2),
-        ("Jane Doe", 550000, 150000, 600000, 0.22, 1, 2, 2, 1, 1, 1),
-        ("John Doe", 320000, 89000, 350000, 0.29, 3, 1, 1, 2, 0, 0)
+        ("Juan Muhirwe", 350000, 95000, 400000, 0.28, 1, 2, 1, 1, 1, 1),
+        ("Jane Doe", 275000, 85000, 300000, 0.32, 1, 2, 1, 2, 0, 0),
+        ("Sanskar", 425000, 115000, 500000, 0.25, 3, 1, 1, 1, 1, 1),
+        ("Hari", 180000, 65000, 200000, 0.38, 3, 1, 3, 3, 0, 0),
+        ("Justin", 550000, 150000, 600000, 0.22, 1, 2, 2, 1, 1, 1),
+        ("Kanhai", 320000, 89000, 350000, 0.29, 3, 1, 1, 2, 1, 1)
     ]
 
     # Insert loan data

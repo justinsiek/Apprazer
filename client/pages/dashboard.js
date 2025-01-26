@@ -50,13 +50,24 @@ const Dashboard = () => {
   const getStatusText = (statusCode) => {
     switch (statusCode) {
       case 0:
-        return 'pending';
+        return 'denied';
       case 1:
         return 'approved';
-      case 2:
-        return 'denied';
       default:
         return 'unknown';
+    }
+  };
+
+  const fetchApplicationDetails = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/retrieve_loans?username=${username}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch loans');
+      }
+      const data = await response.json();
+      setUserApplications(data.loans);
+    } catch (error) {
+      console.error('Error fetching loans:', error);
     }
   };
 
@@ -294,7 +305,7 @@ const Dashboard = () => {
               <div className="relative w-44 h-44">
                 {(() => {
                   const approved = userApplications.filter(app => app.status === 1).length;
-                  const denied = userApplications.filter(app => app.status === 2).length;
+                  const denied = userApplications.filter(app => app.status === 0).length;
                   const total = approved + denied;
                   const approvalRate = total > 0 ? (approved / total) * 100 : 0;
                   const circumference = 2 * Math.PI * 45; // 45 is the radius
@@ -352,7 +363,7 @@ const Dashboard = () => {
               <div className="p-4 bg-gray-50/80 backdrop-blur-sm rounded-xl border-2 border-blue-800/20 shadow-sm">
                 <p className="text-sm font-medium text-gray-800 mb-1">Denied</p>
                 <p className="text-2xl font-semibold text-gray-900">
-                  {userApplications.filter(app => app.status === 2).length}
+                  {userApplications.filter(app => app.status === 0).length}
                 </p>
               </div>
             </div>

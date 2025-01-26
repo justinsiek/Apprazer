@@ -9,10 +9,12 @@ const ApplicationDetail = () => {
   const { id } = router.query;
   const [application, setApplication] = useState(null);
   const [username, setUsername] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const storedUsername = localStorage.getItem('username') || '';
     setUsername(storedUsername);
+    setIsAdmin(storedUsername.toLowerCase() === 'admin');
 
     if (id) {
       fetchApplicationDetails();
@@ -36,13 +38,29 @@ const ApplicationDetail = () => {
   const getStatusText = (statusCode) => {
     switch (statusCode) {
       case 0:
-        return 'pending';
+        return 'denied';
       case 1:
         return 'approved';
-      case 2:
-        return 'denied';
       default:
         return 'unknown';
+    }
+  };
+
+  const handleOverride = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/override_loan', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ lid: parseInt(id) }),
+      });
+      
+      if (response.ok) {
+        fetchApplicationDetails();
+      }
+    } catch (error) {
+      console.error('Error overriding loan status:', error);
     }
   };
 
@@ -82,14 +100,24 @@ const ApplicationDetail = () => {
       {/* Main Content */}
       <main className="relative z-10 p-8">
         <div className="max-w-4xl mx-auto">
-          {/* Back Button */}
-          <Link 
-            href="/dashboard"
-            className="inline-flex items-center text-blue-800 hover:text-blue-900 mb-6"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Dashboard
-          </Link>
+          {/* Back Button and Override Button Row */}
+          <div className="flex justify-between items-center mb-6">
+            <Link 
+              href="/dashboard"
+              className="inline-flex items-center text-blue-800 hover:text-blue-900"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Dashboard
+            </Link>
+            {isAdmin && (
+              <button
+                onClick={handleOverride}
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-800 hover:bg-blue-900 rounded-lg transition-colors"
+              >
+                Override Status
+              </button>
+            )}
+          </div>
 
           {/* Application Header */}
           <div className="bg-white/70 backdrop-blur-md rounded-xl border-2 border-blue-800/20 shadow-xl p-6 mb-6">
@@ -158,7 +186,7 @@ const ApplicationDetail = () => {
                 <div>
                   <label className="text-sm font-medium text-gray-500">Occupancy Type</label>
                   <p className="text-gray-900">
-                    {application.occupancy_type === "1" ? "Residential" : "Investment"}
+                    Residential
                   </p>
                 </div>
                 <div>

@@ -268,6 +268,41 @@ def retrieve_loans():
         print(f"Error retrieving loans: {str(e)}")
         return jsonify({'error': 'Error retrieving loans'}), 500
 
+@app.route('/api/override_loan', methods=['POST'])
+def override_loan():
+    try:
+        data = request.json
+        loan_id = data.get('lid')
+        
+        if not loan_id:
+            return jsonify({'error': 'Loan ID is required'}), 400
+            
+        conn = sqlite3.connect('loandb.db')
+        cursor = conn.cursor()
+        
+        # Get current status
+        cursor.execute("SELECT status FROM loan WHERE lid = ?", (loan_id,))
+        current_status = cursor.fetchone()[0]
+        
+        # Toggle status (0 -> 1, 1 -> 0)
+        new_status = 1 if current_status == 0 else 0
+        
+        # Update the status
+        cursor.execute("UPDATE loan SET status = ?, action_taken = ? WHERE lid = ?", 
+                      (new_status, new_status, loan_id))
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({
+            'message': 'Loan status overridden successfully',
+            'new_status': new_status
+        }), 200
+        
+    except Exception as e:
+        print(f"Error overriding loan status: {str(e)}")
+        return jsonify({'error': 'Error overriding loan status'}), 500
+
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
     
