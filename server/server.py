@@ -31,7 +31,8 @@ def process_image(file_path):
     # Define extraction coordinates for each field on each page
     fields = {
         'monthly_income': (0, 0.575, 0.88, 0.06, 0.013),  # Page 1
-        'property_value': (3, 0.07, 0.209, 0.07, 0.013),  # Page 4 (index 3)
+        'loan_amount': (4, 0.166, 0.122, 0.07, 0.013),  # Page 4 (index 3)
+        'property_value': (4, 0.479, 0.175, 0.07, 0.013),  # Page 4 (index 3)
     }
     
     for field_name, (page_num, left_ratio, top_ratio, width_ratio, height_ratio) in fields.items():
@@ -80,7 +81,7 @@ def process_image(file_path):
             print(f"Extracted {field_name}: {text}")
             
             # Convert to number if it's a numeric field
-            if field_name in ['monthly_income', 'property_value']:
+            if field_name in ['monthly_income', 'loan_amount', 'property_value']:
                 text = text.replace('$', '').replace(',', '')
                 value = float(text)
             else:
@@ -121,15 +122,12 @@ def upload_file():
 
             # Process the file
             extracted_data = process_image(temp_path)
-            print(f"Extracted data: {extracted_data}")
 
             # Validate extracted data
             if None in extracted_data.values():
                 return jsonify({'error': 'Could not extract valid data from document'}), 400
 
             # Use extracted data for loan processing
-            loan_amount = 400000  # You might want to calculate this based on income
-            property_value = extracted_data['property_value']
             debt_to_income_ratio = 0.28  # You might want to calculate this using income
             derived_race = 1
             derived_sex = 1
@@ -144,9 +142,9 @@ def upload_file():
             
             loan_data = (
                 username,           # username
-                loan_amount,       # loan_amount
-                extracted_data['monthly_income'],            # income
-                property_value,    # property_value
+                extracted_data['loan_amount'],       # loan_amount
+                extracted_data['monthly_income'],    # income
+                extracted_data['property_value'],    # property_value
                 debt_to_income_ratio, # debt_to_income_ratio
                 derived_race,      # derived_race (1 = White)
                 derived_sex,       # derived_sex (1 = Male)
