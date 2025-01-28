@@ -1,4 +1,6 @@
 # Winner of Irvine Hacks 2025 - Best Use of AI in Real Estate
+![apprazertwo](https://github.com/user-attachments/assets/7195c666-82bb-473c-9459-6f812d1365ac)
+
 
 # Inspiration
 Whenever you watch the news, it's hard to avoid the constant discussion of rising home prices and how markets are fully shifted away from first-time home buyers relying on classic mortgages. Most sellers are looking for quick offers and follow-through that highly favors those with cash, but what if we could create a new edge for lenders and borrowers?
